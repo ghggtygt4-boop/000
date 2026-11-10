@@ -1,21 +1,283 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мой первый инженерный сервис</title>
-  <style>
-    body { font-family: system-ui, sans-serif; background: #f8fafc; padding: 40px; text-align: center; }
-    .card { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    h1 { color: #2563eb; }
-    button { background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 Калькулятор времени рендера | Blender</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2b2b2b 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .container {
+    background: #2b2b2b;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 1px solid #3a3a3a;
+  }
+  
+  h1 {
+    color: #ea7600;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 26px;
+  }
+  
+  .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 30px;
+    font-size: 14px;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ccc;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  input {
+    width: 100%;
+    padding: 12px 15px;
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #ea7600;
+  }
+  
+  .row {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .row .input-group { flex: 1; }
+  
+  button {
+    width: 100%;
+    padding: 14px;
+    background: #ea7600;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+  }
+  
+  button:hover {
+    background: #ff8c1a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(234,118,0,0.4);
+  }
+  
+  button:active { transform: translateY(0); }
+  
+  .result {
+    margin-top: 25px;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    border-left: 4px solid #ea7600;
+    display: none;
+  }
+  
+  .result.show { display: block; animation: fadeIn 0.5s; }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .result h2 {
+    color: #ea7600;
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  .time-display {
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    margin: 15px 0;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .time-details {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #3a3a3a;
+  }
+  
+  .time-block {
+    text-align: center;
+  }
+  
+  .time-block .value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ea7600;
+  }
+  
+  .time-block .label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  
+  .info {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(234,118,0,0.1);
+    border-radius: 6px;
+    font-size: 13px;
+    color: #ccc;
+  }
+  
+  .footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+    font-size: 12px;
+  }
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>🚀 Сервис запущен на GitHub Pages!</h1>
-    <p>Проект по дисциплине «Технология программирования», 2 курс.</p>
-    <button onclick="alert('Ура! Скрипт работает!')">Проверить работу</button>
+  <div class="container">
+    <h1>🎬 Калькулятор рендера</h1>
+    <p class="subtitle">Blender · Оценка времени выполнения проекта</p>
+    
+    <div class="row">
+      <div class="input-group">
+        <label>⏱ Время 1 кадра (сек)</label>
+        <input type="number" id="frameTime" step="0.1" min="0" placeholder="например, 5">
+      </div>
+      <div class="input-group">
+        <label>🎞 Всего кадров</label>
+        <input type="number" id="totalFrames" min="1" placeholder="например, 240">
+      </div>
+    </div>
+    
+    <div class="input-group">
+      <label>⚙️ Потоков рендера (CPU/GPU)</label>
+      <input type="number" id="threads" min="1" value="1" placeholder="1">
+    </div>
+    
+    <button onclick="calculate()">Рассчитать время рендера</button>
+    
+    <div class="result" id="result">
+      <h2>📊 Итоговое время рендера:</h2>
+      <div class="time-display" id="mainTime">0ч 0м 0с</div>
+      <div class="time-details">
+        <div class="time-block">
+          <div class="value" id="days">0</div>
+          <div class="label">дней</div>
+        </div>
+        <div class="time-block">
+          <div class="value" id="hours">0</div>
+          <div class="label">часов</div>
+        </div>
+        <div class="time-block">
+          <div class="value" id="minutes">0</div>
+          <div class="label">минут</div>
+        </div>
+        <div class="time-block">
+          <div class="value" id="seconds">0</div>
+          <div class="label">секунд</div>
+        </div>
+      </div>
+      <div class="info" id="info"></div>
+    </div>
+    
+    <div class="footer">
+      Методика «Театральная школа» · Волгодонск · 2026
+    </div>
   </div>
+
+<script>
+function calculate() {
+  const frameTime = parseFloat(document.getElementById('frameTime').value);
+  const totalFrames = parseInt(document.getElementById('totalFrames').value);
+  const threads = parseInt(document.getElementById('threads').value) || 1;
+  
+  if (isNaN(frameTime) || isNaN(totalFrames) || frameTime <= 0 || totalFrames <= 0) {
+    alert('❌ Пожалуйста, введите корректные значения!');
+    return;
+  }
+  
+  // Расчёт с учётом потоков (упрощённо)
+  const totalSeconds = (frameTime * totalFrames) / threads;
+  
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  
+  document.getElementById('days').textContent = days;
+  document.getElementById('hours').textContent = hours;
+  document.getElementById('minutes').textContent = minutes;
+  document.getElementById('seconds').textContent = seconds;
+  
+  // Красивое главное отображение
+  let mainTime = '';
+  if (days > 0) mainTime += `${days}д `;
+  if (hours > 0 || days > 0) mainTime += `${hours}ч `;
+  mainTime += `${minutes}м ${seconds}с`;
+  document.getElementById('mainTime').textContent = mainTime;
+  
+  // Доп. информация
+  let infoText = `🎞 ${totalFrames} кадров × ${frameTime} сек`;
+  if (threads > 1) infoText += ` / ${threads} потоков`;
+  infoText += ` = ${Math.round(totalSeconds)} сек`;
+  
+  if (days >= 1) {
+    infoText += ` ⚠️ Долгий рендер! Рекомендуется использовать ферму или облако.`;
+  } else if (hours >= 4) {
+    infoText += ` 💡 Запустите рендер на ночь.`;
+  } else {
+    infoText += ` ✅ Быстрый рендер.`;
+  }
+  
+  document.getElementById('info').textContent = infoText;
+  document.getElementById('result').classList.add('show');
+}
+
+// Расчёт по Enter
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('keypress', e => {
+    if (e.key === 'Enter') calculate();
+  });
+});
+</script>
 </body>
 </html>
